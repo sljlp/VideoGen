@@ -97,23 +97,23 @@ bool Motion::getTransformedImage(const int &imageIndex, const int& frameIndex, M
     float cX = 0,cY = 0;
     image = cv::Mat(video_h,video_w,src_image.type());
     cv::Mat temp_mask(0,0,image.type());
-    cv::imshow("src_image", src_image);
+    //cv::imshow("src_image", src_image);
     t.transformImage(src_image, cX, cY, image, temp_mask);
-    char out_image[256];
-    sprintf(out_image, "outimage_%d",imageIndex);
-    char out_mask[256];
-    sprintf(out_mask, "outmask_%d",imageIndex);
-    cv::imshow(out_mask, temp_mask);
-    cv::imshow(out_image, image);
+    //char out_image[256];
+    //sprintf(out_image, "outimage_%d",imageIndex);
+    //char out_mask[256];
+    //sprintf(out_mask, "outmask_%d",imageIndex);
+    //cv::imshow(out_mask, temp_mask);
+    //cv::imshow(out_image, image);
 //    cout<<src_image.size()<<"\n";
 //    cout<<image.size()<<"\n";
 //    cv::waitKey();
     
 //    image.mul(temp_mask);
 //    cv::Mat temp_d = cv::Mat(image.rows, image.cols, image.type(),cv::Scalar(255,255,255,255));
-//    printf("%d %d %d %d\n", temp_mask.cols, temp_mask.rows, temp_mask.type(),temp_mask.channels());
-//    printf("%d %d %d %d\n", image.cols, image.rows, image.type(),image.channels());
-//    cout<<image<<"\n"<<temp_mask<<"\n";
+//    //printf("%d %d %d %d\n", temp_mask.cols, temp_mask.rows, temp_mask.type(),temp_mask.channels());
+//    //printf("%d %d %d %d\n", image.cols, image.rows, image.type(),image.channels());
+//    //cout<<image<<"\n"<<temp_mask<<"\n";
 //    image = image.mul(temp_mask)/255;
     temp_mask.copyTo(mask);
     

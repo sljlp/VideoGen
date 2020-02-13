@@ -1,4 +1,4 @@
-json/ 对json文件的操作工具包
+json/ 对json文件的操作工具包  
 motion 解析 json  
 transform 表示图像变换(平移，旋转，缩放，透明度等)信息  
 resouce表示图像，视频等资源文件  

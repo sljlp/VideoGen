@@ -21,7 +21,16 @@ private:
     float rx, ry, rz;
     float sx, sy, sz;
     float opcity;
+    float anchorx,anchory,anchorz;
     bool ddd;
+    struct CacheTransformMat{
+        int imW, imH;
+        int outW, outH;
+        float centerX, centerY;
+        cv::Mat father_mat;
+        cv::Mat mat;
+    }* cacheMat = NULL;
+    
 public:
     
     //x, y, z, rx, ry, rz,sx,sy,sz, o, ddd
@@ -37,11 +46,20 @@ public:
     //获得当前变换的matrix表示
     Mat getMatrix();
     
+    //if there is a cache return true ,otherwise return false
+    bool getCacheMat(cv::Mat& mat){
+        if(cacheMat == nullptr){
+            return false;
+        }
+        this->cacheMat->mat.copyTo(mat);
+        return true;
+    };
     //先变pre_transform 然后再进行thistransform， z最后返回结果
-    Transform followTransform(const Transform& pre_transform);
+    void followTransform(const Transform& pre_transform);
     
+    void processTransform(const int&, const int&, const float&, const float&, const int& outW = 0, const int& outH = 0, cv::Mat fatherMat = cv::Mat());
     //该矩阵作用与输入图片，得到变换后的图像
-    void transformImage(const cv::Mat& image,const float& centerX, const float& centerY, cv::OutputArray out_image, cv::OutputArray mask);
+    void transformImage(const cv::Mat& image,const float& centerX, const float& centerY, cv::Mat& out_image, cv::Mat& mask);
     
     float getOpacity();
     
@@ -79,8 +97,16 @@ public:
         setSXYZ(0,0,&sz);
     }
     
-    
-    
+    void setAXYZ(float* x = nullptr, float* y = nullptr, float* z = nullptr);
+    inline void setAX(float x){
+        setAXYZ(&x);
+    }
+    inline void setAY(float y){
+        setAXYZ(nullptr, &y,nullptr);
+    }
+    inline void setAZ(float z){
+        setAXYZ(nullptr,nullptr,&z);
+    }
     
 };
 

@@ -14,6 +14,13 @@
 
 using namespace std;
 
+#ifndef ABS
+#define ABS(x) ((x)<0?-(x):(x))
+#endif
+#ifndef MIN_POSITIVE_FLOAT
+#define MIN_POSITIVE_FLOAT 1e-12
+#endif
+
 //Mat Transform::getMatrix(float iw, float ih){
 //    float x = this->x,y = this->y,z = this->z;
 //    float rx,ry,rz;
@@ -39,17 +46,61 @@ cv::Mat Translate(float x,float y,float z = 0.0) {
     return T;
 }
 
-cv::Mat Rotate(float rx, float ry, float rz = 0.0) {
-    cv::Mat R(4, 4, CV_32F);
-    cv::Mat_<float> R_ (R);
+#define ROTATE_AXI_X 0
+#define ROTATE_AXI_Y 1
+#define ROTATE_AXI_Z 2
+#ifndef MATH_PI
+#define MATH_PI 3.1415926
+#endif
+cv::Mat __Rotate(int axi, float angle) {
+    cv::Mat mat(4, 4, CV_32FC1);
+    mat = 0;
+    cv::Mat_ <float>m = mat;
+    m[3][3] = 1;
+    float c = cos(angle*MATH_PI / 180);
+    float s = sin(angle*MATH_PI / 180);
 
-    R_ <<
-       1,0,0,0,
-       0,1,0,0,
-       0,0,1,0,
-       0,0,0,1;
+    switch (axi)
+    {
+    case ROTATE_AXI_X:
+        m[0][0] = 1;
+        m[1][1] = m[2][2] = c;
+        m[1][2] = -s;
+        m[2][1] = s;
+        break;
+    case ROTATE_AXI_Y:
+        m[1][1] = 1;
+        m[2][2] = m[0][0] = c;
+        m[0][2] = s;
+        m[2][0] = -s;
+        break;
+    case ROTATE_AXI_Z:
+        m[2][2] = 1;
+        m[0][0] = m[1][1] = c;
+        m[0][1] = -s;
+        m[1][0] = s;
+        break;
+    }
 
-    return R;
+    return mat;
+
+};
+
+// input angles in degree
+cv::Mat Rotate(float rx=0.0, float ry=0.0, float rz = 0.0) {
+    
+    return __Rotate(ROTATE_AXI_X, rx) * __Rotate(ROTATE_AXI_Y, ry) * __Rotate(ROTATE_AXI_Z, rz);
+//
+//    cv::Mat R(4, 4, CV_32F);
+//    cv::Mat_<float> R_ (R);
+//
+//    R_ <<
+//       1,0,0,0,
+//       0,1,0,0,
+//       0,0,1,0,
+//       0,0,0,1;
+//
+//    return R;
 
 }
 
@@ -79,41 +130,31 @@ Transform::Transform(float x,float y,float z, float rx, float ry, float rz, floa
 
     this->opcity = opcity;
     this->ddd = ddd;
+    this->cacheMat = nullptr;
 
 }
 
 Transform::Transform(const Transform& t) {
-    this->x = t.x;
-    this->y = t.y;
-    this->z = t.z;
-
-    this->rx = t.rx;
-    this->ry = t.ry;
-    this->rz = t.rz;
-
-    this->sx = t.sx;
-    this->sy = t.sy;
-    this->sz = t.sz;
-
-    this->opcity = t.opcity;
-    this->ddd = t.ddd;
+    memcpy(this, &t, sizeof(Transform));
+    if(t.cacheMat){
+        this->cacheMat = new CacheTransformMat;
+        assert(this->cacheMat != nullptr);
+        memcpy(cacheMat, t.cacheMat, sizeof(CacheTransformMat));
+        cacheMat->mat=cv::Mat();
+        t.cacheMat->mat.copyTo(cacheMat->mat);
+        
+    }
 }
 
 Transform& Transform::operator= (const Transform& t) {
-    this->x = t.x;
-    this->y = t.y;
-    this->z = t.z;
-
-    this->rx = t.rx;
-    this->ry = t.ry;
-    this->rz = t.rz;
-
-    this->sx = t.sx;
-    this->sy = t.sy;
-    this->sz = t.sz;
-
-    this->opcity = t.opcity;
-    this->ddd = t.ddd;
+    memcpy(this, &t, sizeof(Transform));
+    if(t.cacheMat){
+        this->cacheMat = new CacheTransformMat;
+        assert(this->cacheMat != nullptr);
+        memcpy(cacheMat, t.cacheMat, sizeof(CacheTransformMat));
+        cacheMat->mat=cv::Mat();
+        t.cacheMat->mat.copyTo(cacheMat->mat);
+    }
     return *this;
 }
 Transform::Transform() {
@@ -131,10 +172,14 @@ Transform::Transform() {
 
     this->opcity = 1.0;
     this->ddd = 0;
+    
+    this->cacheMat = nullptr;
 }
 
 Transform::~Transform() {
-
+    if(cacheMat){
+        delete cacheMat;
+    }
 }
 
 void Transform::set(float x,float y,float z, float rx, float ry, float rz, float sx,float sy, float sz, float opcity, bool ddd) {
@@ -152,19 +197,28 @@ void Transform::set(float x,float y,float z, float rx, float ry, float rz, float
 
     this->opcity = opcity;
     this->ddd = ddd;
+    this->cacheMat = nullptr;
 }
 
-//该矩阵作用与输入图片，得到变换后的图像
-void Transform::transformImage(const cv::Mat& image, const float& centerX, const float& centerY, cv::OutputArray out_image, cv::OutputArray mask) {
-
-    assert (out_image.type() == CV_8UC3);
-    assert (mask.type() == CV_32F || mask.type() == CV_8U || mask.type() == CV_8UC3);
-//    assert ()
-
-    cout << out_image.size()<<"\n";
-
-//    cv::Mat out_image(osize, image.type());
-    cv::Size osize = out_image.size();
+void Transform::processTransform(const int& imW, const int& imH, const float& centerX, const float& centerY, const int& outW, const int& outH, cv::Mat fatherMat){
+    assert((fatherMat.cols == 0 || fatherMat.rows == 0) || fatherMat.type() == CV_32F);
+    if (this->cacheMat){
+        if ( ABS(cacheMat->centerX - centerX) < MIN_POSITIVE_FLOAT
+            && ABS(cacheMat->centerY - centerY) < MIN_POSITIVE_FLOAT
+            && imW == this->cacheMat->imW
+            && imH == this->cacheMat->imH
+//            && outH == cacheMat->outH
+//            && outW == cacheMat->outW
+            && (fatherMat.size() == cacheMat->father_mat.size()
+                && cv::sum(cv::abs(fatherMat - cacheMat->father_mat))[0] < MIN_POSITIVE_FLOAT)
+            ){
+            return;
+        }
+    }else{
+        this->cacheMat = new CacheTransformMat;
+    }
+    //    cv::Mat out_image(osize, image.type());
+//    cv::Size osize = cv::Size(outW, outH);
 
     cv::Mat align_T = Translate(-centerX, -centerY);
     cv::Mat T = Translate(this->x, this->y, this->z);
@@ -172,8 +226,11 @@ void Transform::transformImage(const cv::Mat& image, const float& centerX, const
     cv::Mat S = Scale(this->sx, this->sy, this->sz);
     cv::Mat C = T*align_T.inv()*S*R*align_T;
 
-    float iw = (float)image.cols / 2.0;
-    float ih = (float)image.rows / 2.0;
+//    float iw = (float)imW / 2.0;
+//    float ih = (float)imH / 2.0;
+    float iw, ih;
+    iw = this->anchorx;
+    ih = this->anchory;
     cv::Mat pts_src(4,4,CV_32F);
     cv::Mat_<float> pts_src_(pts_src);
     pts_src_ <<
@@ -181,8 +238,10 @@ void Transform::transformImage(const cv::Mat& image, const float& centerX, const
              centerY - ih,   centerY + ih,   centerY - ih,   centerY + ih,
              0.0f,           0.0f,           0.0f,           0.0f,
              1.0f,           1.0f,           1.0f,           1.0f;
-
+    cout << C<<"\n";
+    cout << pts_src<<"\n";
     cv::Mat pts_dst = C * pts_src;
+    cout<<pts_dst<<"\n";
     cv::Mat pts_mid(4,4,CV_32F);
     pts_src.copyTo(pts_mid);
     cv::Mat_<float> pts_mid_(pts_mid);
@@ -203,23 +262,38 @@ void Transform::transformImage(const cv::Mat& image, const float& centerX, const
 //        pts_dst_vec[i][1] = pts_dst.at<float>(1,i);
     }
 
-    cv::Mat perspect_mat = cv::getPerspectiveTransform(pts_src_vec, pts_dst_vec);
+    if (fatherMat.cols != 0 && fatherMat.rows != 0){
+//pts 求 inv(father_mat) as inv_father_mat
+//        pts_src_vec = inv_father_mat(pts_src_vec)
+//
+    }
 //    cv::imshow("bg", out_image);
+    cout<<"src pts"<<pts_src_vec<<"\n";
+    cout<<"src pts"<<pts_dst_vec<<"\n";
+    cacheMat->mat = cv::getPerspectiveTransform(pts_src_vec, pts_dst_vec);
+        
+}
 
-    cv::warpPerspective(image, out_image, perspect_mat, osize);
+//该矩阵作用与输入图片，得到变换后的图像
+void Transform::transformImage(const cv::Mat& image, const float& centerX, const float& centerY, cv::Mat& out_image, cv::Mat& mask) {
 
+    assert (out_image.type() == CV_8UC3);
+    assert (mask.type() == CV_8UC3);
+    
+    cv::imshow("image0", image);
+    
+    this->processTransform(image.cols, image.rows, centerX, centerY, out_image.cols, out_image.rows);
+    cout<<cacheMat->mat<<"\n";
+    cout<<"mat:\n"<<cacheMat->mat<<"\n";
+    cv::warpPerspective(image, out_image, this->cacheMat->mat, out_image.size());
+
+    cv::imshow("img1", out_image);
+//    cv::waitKey();
     cv::Mat mask_image ;
-    if (CV_32F == mask.type()) {
-        mask_image = cv::Mat::ones(image.size(), mask.type());
-    } else {
-        mask_image = cv::Mat(image.size(),mask.type(), cv::Scalar(255,255,255));
-    }
+    mask_image = cv::Mat(image.size(),mask.type(), cv::Scalar(255,255,255,255));
     cv::imshow("m1", mask_image);
-    cv::Mat mask_bg = cv::Mat::zeros(out_image.size(), mask.type());
-    cv::warpPerspective(mask_image, mask_bg, perspect_mat, mask_bg.size());
-    if (mask_bg.type() != CV_32F) {
-        mask_bg *=  255;
-    }
+    cv::Mat mask_bg = cv::Mat(out_image.size(), mask.type(),cv::Scalar(0,0,0,0));
+    cv::warpPerspective(mask_image, mask_bg, this->cacheMat->mat, mask_bg.size());
     mask_bg.copyTo(mask);
 
 }
@@ -266,3 +340,19 @@ void Transform::setOpacity(float op){
 void Transform::setDDD(bool ddd){
     this->ddd = ddd;
 };
+void Transform::setAXYZ(float*ax, float* ay, float*az){
+    if(ax){
+        this->anchorx = *ax;
+    }
+    if(ay){
+        this->anchory = *ay;
+    }
+    if(az){
+        this->anchorz = *az;
+    }
+}
+
+void Transform::followTransform(const Transform& pre_transform){
+    cv::Mat mat;
+
+}

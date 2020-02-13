@@ -100,7 +100,8 @@ Resource::Resource(){
 
 
 // 目前支持  image: jpg/jpeg, png, video: mp4, avi
-void Resource::load(const char * resPath){
+void Resource::load(const char * resPath, int w, int h){
+    
     
     if (cap){
         cap->release();
@@ -121,14 +122,21 @@ void Resource::load(const char * resPath){
         this->res_type = RES_TYPE_IMAGE;
         this->image = new cv::Mat();
         *(this->image) = cv::imread(resPath);
+        assert(image->cols > 0 && image->rows);
+        
         frameCount = - 1;
+        assert((image->cols == w && image -> rows == h) || (w == 0 && h == 0));
     }
     else if (0 == strcmp("4pm", reversedExtension)
              || 0 == strcmp("iva", reversedExtension)){
         printf("is video\n");
         this->res_type = RES_TYPE_VIDEO;
         this->cap = new cv::VideoCapture(resPath);
+        assert(cap);
         frameCount = cap->get(cv::CAP_PROP_FRAME_COUNT);
+        int frameH = cap->get(cv::CAP_PROP_FRAME_HEIGHT);
+        int frameW = cap->get(cv::CAP_PROP_FRAME_WIDTH);
+        assert(frameH == h && frameW == w || h == 0 && w == 0);
     }
     
     loaded = true;

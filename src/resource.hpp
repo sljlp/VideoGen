@@ -48,7 +48,7 @@ public:
     
     Resource& operator=(const Resource& res);
     
-    void load(const char*);
+    void load(const char*, int h = 0, int w = 0);
     Mat getNextImage(const int& frameIndex);
     
     int getType(){
@@ -62,6 +62,15 @@ public:
     
     int getWidth();
     int getHeight();
+    
+    bool isValid(){
+        return loaded;
+    }
+    
+    double getFPS(){
+        assert(loaded && cap && image == nullptr);
+        return cap->get(cv::CAP_PROP_FPS);
+    }
     
 };
 

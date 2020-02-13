@@ -46,8 +46,14 @@ public:
     int getLyaerCount();
     int getVideoW();
     int getVideoH();
+    void loadResource(const char* json, const vector<string> &imagpath, const vector<string>& maskPath);
     
-    void loadJson(const char* jsonPath);
+    int getFrameCount(){
+        return this->framecount;
+    }
+    int getJsonStartIndex(){
+        return json_start_index;
+    }
 
 private:
     Value root;
@@ -59,7 +65,8 @@ private:
     int video_w;
     int video_h;
     int layerCount;
-    
+    int framecount;
+    int json_start_index;
 };
 
 #endif /* motion_hpp */

@@ -22,7 +22,7 @@ cv::Mat VideoGenerator::genFrame(const int& frameIndex){
         
         cv::Mat image, mask(0,0,CV_8UC3);
         bool hast = motion.getTransformedImage(i, frameIndex, image, mask);
-        printf("has transformation:%d\n", hast);
+        //printf("has transformation:%d\n", hast);
         if (hast){
             cv::imshow("image1", image);
             vg_drawOn(image, content, mask);

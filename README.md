@@ -11,4 +11,4 @@ Video according to AE
   该文件夹包含 std.json, std_fg.mp4, std_mask.mp4 等若干文件  
   cd res/ . 
 #### 3.执行 samples/test.sh 脚本 
-  在执行前修改脚本中的main程序路径（即第1步中编译得到的VideiGen）
+  在执行前修改脚本中的main程序路径（即第1步中编译得到的VideoGen）

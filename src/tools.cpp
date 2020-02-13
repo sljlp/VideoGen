@@ -14,7 +14,7 @@ void vg_blend(const cv::Mat& image1, const cv::Mat& image2, const cv::Mat & mask
     assert(image2.type() == image1.type());
     assert (mask1.type() == image1.type());
     
-    printf("%d %d %d\n ", CV_8U, blendedimage.type(), image1.type());
+    //printf("%d %d %d\n ", CV_8U, blendedimage.type(), image1.type());
     assert(blendedimage.type() == image1.type());
     assert(image1.size() == image2.size());
     assert(mask1.size() == mask2.size());

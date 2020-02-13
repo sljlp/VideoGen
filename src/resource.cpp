@@ -14,7 +14,7 @@ void getReversedExtension(const char* filepath, char extension[]){
     size_t i;
     for (i = str_len - 1;i>=0 && filepath[i] != '.';i--){
         extension[str_len - 1 - i] = filepath[i];
-        printf("i = %zu\n", i);
+        //printf("i = %zu\n", i);
     }
     extension[str_len - 1 - i] = '\0';
     assert(filepath[i] == '.');

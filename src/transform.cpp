@@ -238,10 +238,10 @@ void Transform::processTransform(const int& imW, const int& imH, const float& ce
              centerY - ih,   centerY + ih,   centerY - ih,   centerY + ih,
              0.0f,           0.0f,           0.0f,           0.0f,
              1.0f,           1.0f,           1.0f,           1.0f;
-    cout << C<<"\n";
-    cout << pts_src<<"\n";
+    //cout << C<<"\n";
+    //cout << pts_src<<"\n";
     cv::Mat pts_dst = C * pts_src;
-    cout<<pts_dst<<"\n";
+    //cout<<pts_dst<<"\n";
     cv::Mat pts_mid(4,4,CV_32F);
     pts_src.copyTo(pts_mid);
     cv::Mat_<float> pts_mid_(pts_mid);
@@ -268,8 +268,8 @@ void Transform::processTransform(const int& imW, const int& imH, const float& ce
 //
     }
 //    cv::imshow("bg", out_image);
-    cout<<"src pts"<<pts_src_vec<<"\n";
-    cout<<"src pts"<<pts_dst_vec<<"\n";
+    //cout<<"src pts"<<pts_src_vec<<"\n";
+    //cout<<"src pts"<<pts_dst_vec<<"\n";
     cacheMat->mat = cv::getPerspectiveTransform(pts_src_vec, pts_dst_vec);
         
 }
@@ -280,18 +280,18 @@ void Transform::transformImage(const cv::Mat& image, const float& centerX, const
     assert (out_image.type() == CV_8UC3);
     assert (mask.type() == CV_8UC3);
     
-    cv::imshow("image0", image);
+    //cv::imshow("image0", image);
     
     this->processTransform(image.cols, image.rows, centerX, centerY, out_image.cols, out_image.rows);
-    cout<<cacheMat->mat<<"\n";
-    cout<<"mat:\n"<<cacheMat->mat<<"\n";
+    //cout<<cacheMat->mat<<"\n";
+    //cout<<"mat:\n"<<cacheMat->mat<<"\n";
     cv::warpPerspective(image, out_image, this->cacheMat->mat, out_image.size());
 
-    cv::imshow("img1", out_image);
+    //cv::imshow("img1", out_image);
 //    cv::waitKey();
     cv::Mat mask_image ;
     mask_image = cv::Mat(image.size(),mask.type(), cv::Scalar(255,255,255,255));
-    cv::imshow("m1", mask_image);
+    //cv::imshow("m1", mask_image);
     cv::Mat mask_bg = cv::Mat(out_image.size(), mask.type(),cv::Scalar(0,0,0,0));
     cv::warpPerspective(mask_image, mask_bg, this->cacheMat->mat, mask_bg.size());
     mask_bg.copyTo(mask);

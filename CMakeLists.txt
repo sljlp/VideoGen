@@ -10,4 +10,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(VideoGen ${OpenCV_LIBS})
 
 # to be changed
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++0x")
+# generally set as follow
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# for some mac you should set as follow
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++0x")

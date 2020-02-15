@@ -3,6 +3,8 @@ Video according to AE
 
 # samples usage  
 #### 1.编译代码  
+  CMakeLists.txt 最后一行需要根据编译环境自主修改,现在是部分macos版本的，如果在Ubuntu下，
+一般可以改为set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
   mkdir build  
   cd build  
   cmake ..  

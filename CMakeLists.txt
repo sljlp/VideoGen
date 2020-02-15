@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 1.1)
+cmake_minimum_required(VERSION 3.0)
 project (VideoGen) #project_name是你要创建的工程名
 find_package(OpenCV 4.1 REQUIRED)
 

@@ -21,7 +21,7 @@ masks=null
 
 # bt is the best time point (in unit of second) for shared page
 # when bt=10, it means the shared page is generated at 10s of the video
-$bt=10
+bt=10
 
 # external music path for replacing the original music in the produced video
 audio="test/wy_caishen2/audio.mp3" 

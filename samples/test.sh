@@ -32,7 +32,7 @@ tempout=${out}_temp.mp4
 # set main to the path to the executable binary file
 $main "$json $tempout $fg $fgm $bg $bgm $share" "$imgs" "$masks" "0 0 0 $bt"
 
-# insert audio into temp video to get the last required video
+# insert audio into temp video to get the last produced video
 # if the $audio file exists, we use it; otherwise we use the original music contained in fg/bg
 if [ -s $audio ]
 then

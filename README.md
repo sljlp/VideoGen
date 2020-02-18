@@ -18,7 +18,7 @@ opencv3+ package for python3
   该文件夹包含 std.json, std_fg.mp4, std_mask.mp4 等若干文件  
   cd res/ . 
 #### 3.执行 samples/test.sh 脚本
-  在执行前修改脚本中的main程序路径（即第1步中编译得到的VideoGen）
+  在执行前修改脚本中的main程序路径（即第1步中编译得到的VideoGen）  
   在执行前看是否需要生成文字图片，在生成文字图片时需要执行py/genTxt.py
   
 # 注意

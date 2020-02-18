@@ -22,4 +22,4 @@ opencv3+ package for python3
   在执行前看是否需要生成文字图片，在生成文字图片时需要执行py/genTxt.py
   
 # 注意
-#### 1.为了区分文字图层，在从AE导出json时，需要请图片图层的name（json文件中显示为关键字“nm”）的前缀设为text
+#### 1.为了区分文字图层，在从AE导出json时，需要将图片图层的name（json文件中显示为关键字“nm”）的前缀设为text

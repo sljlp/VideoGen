@@ -11,7 +11,7 @@ genTxt.py 的参数有:
             --color 格式“#+6l位16进制数字”  
             --output 文字图片输出路径  
             --mask 可选， 文字的mask输出路径  
-## VIdeoGen何以获取最中视频(参考samples/test.sh)
+## VIdeoGen何以获取最中视频(参考samples/test.sh[https://github.com/sljlp/VideoGen/blob/master/samples/test.sh])
 VideoGen 的参数有：  
             arg[1] ：json tempout fg fgm bg bgm share 6个参数作为一组输入，一次表示json文件，无声视频输出路径，前景视频，前景蒙版，背景视频，背景蒙版，分享界面图片，json是必选，其他为可选，当为可选时，必须设值为null字符串  
             arg[2]: images 若干图片路径作为输入，其中既有用户上传的图片，也有文字图片

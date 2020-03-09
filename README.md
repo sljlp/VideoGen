@@ -2,6 +2,7 @@
 Video according to AE  
 # required
 compiler supporting c++11  
+ffmpeg  
 opencv 4.1+ for c++  
 cmake3.0+  
 python3.6+  

@@ -70,42 +70,43 @@ public:
     void setDDD(bool);
     
     inline void setX(float x){
-        setXYZ(&x, 0, 0);
+        this->x = x;
     }
     inline void setY(float y){
-        setXYZ(0,&y,0);
+        this->y = y;
     }
     inline void setZ(float z){
-        setXYZ(0,0,&z);
+        this->z = z;
     }
     inline void setRX(float rx){
-        setRXYZ(&rx,0,0);
+        this->rx = rx;
     }
     inline void setRY(float ry){
-        setRXYZ(0,&ry,0);
+        this->ry = ry;
     }
     inline void setRZ(float rz){
-        setRXYZ(0,0,&rz);
+        this->rz = rz;
     }
     inline void setSX(float sx){
-        setSXYZ(&sx,0,0);
+        this->sx = sx;
     }
     inline void setSY(float sy){
-        setSXYZ(0,&sy,0);
+        this->sy = sy;
     }
     inline void setSZ(float sz){
-        setSXYZ(0,0,&sz);
+        this->sz = sz;
     }
     
     void setAXYZ(float* x = nullptr, float* y = nullptr, float* z = nullptr);
     inline void setAX(float x){
-        setAXYZ(&x);
+        this->anchorx = x;
     }
     inline void setAY(float y){
-        setAXYZ(nullptr, &y,nullptr);
+        anchory = y;
     }
     inline void setAZ(float z){
-        setAXYZ(nullptr,nullptr,&z);
+//        setAXYZ(nullptr,nullptr,&z);
+        anchorz = z;
     }
     
 };

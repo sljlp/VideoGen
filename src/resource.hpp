@@ -25,6 +25,7 @@ using namespace std;
 #define RES_TYPE_VIDEO 0x01
 #define RES_TYPE_IMAGE 0x02
 
+#include <assert.h>
 class Resource{
 private:
     bool loaded;

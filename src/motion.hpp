@@ -23,6 +23,8 @@ using namespace std;
 
 #include <opencv2/opencv.hpp>
 using namespace std;
+#include<vector>
+#include <string>
 
 //#define MOTINVIDEO
 
@@ -54,12 +56,15 @@ public:
     int getJsonStartIndex(){
         return json_start_index;
     }
+    
+    string getLayerName(int layerIndex);
 
 private:
     Value root;
     TransformMap transformMap;
     ResMap resMap;
     ResMap maskMap;
+    std::vector<string> layerName;
     ImageIndexIDMap imageIndexIdMap;
     
     int video_w;

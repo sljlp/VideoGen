@@ -9,7 +9,13 @@ PIL packge for python3
 opencv3+ package for python3  
 
 ### 安装ffmpeg
+1.从官网下载ffmpeg安装包并解压  
+2.进入安装包目录 执行 ./configure --enable-shared; make install  
 ### 安装opencv
+1.从官网下载opencv安装包并解压  
+2.进入解压后的安装包目录，创建build文件夹并进入build文件夹  
+3. 执行 cmake -D CMAKE_CXX_FLAGS="-Wl,-Bsymbolic" ..  
+4. 执行make install  
 
 # samples usage  
 #### 1.编译代码  

@@ -1,12 +1,15 @@
 # VideoGen
 Video according to AE  
 # required
-compiler supporting c++11
-opencv 4.1+ for c++
-cmake3.0+
-python3.6+
-PIL packge for python3
-opencv3+ package for python3
+compiler supporting c++11  
+opencv 4.1+ for c++  
+cmake3.0+  
+python3.6+  
+PIL packge for python3  
+opencv3+ package for python3  
+
+## 安装ffmpeg
+## 安装opencv
 
 # samples usage  
 #### 1.编译代码  

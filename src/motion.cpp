@@ -20,12 +20,12 @@ using namespace std;
 #include "resource.hpp"
 #include <stdio.h>
 
-void __parseJson(const Value& root, const vector<string>& src_image, const vector<string>& src_image_mask_path, ResMap &resMap, ResMap &maskMap, TransformMap &transformMap, ImageIndexIDMap &imageIndexIdMap);
+void __parseJson(const Value& root, const vector<string>& src_image, const vector<string>& src_image_mask_path, ResMap &resMap, ResMap &maskMap, TransformMap &transformMap, ImageIndexIDMap &imageIndexIdMap, vector<string> & layerName);
 void __loadJson(const char* jsonPath, Json::Value&);
 
 void Motion::loadResource(const char* json, const vector<string> &imagpath, const vector<string>& maskPath){
     __loadJson(json,this->root);
-    __parseJson(this->root, imagpath, maskPath, this->resMap, this->maskMap, this->transformMap, this->imageIndexIdMap);
+    __parseJson(this->root, imagpath, maskPath, this->resMap, this->maskMap, this->transformMap, this->imageIndexIdMap, this->layerName);
 //    for (ResMap::iterator it = resMap.begin();it!=resMap.end();it++){
 //        cv::imshow(it->first.c_str(), it->second.getNextImage(0));
 //        cv::waitKey();
@@ -87,8 +87,9 @@ bool Motion::getTransformedImage(const int &imageIndex, const int& frameIndex, M
     string key = this->imageIndexIdMap[imageIndex];
     Mat src_image = resMap[key].getNextImage(frameIndex);
     Mat src_mask;
-    if (resMap.find(key) != resMap.end()){
-        src_mask = resMap[key].getNextImage(frameIndex);
+    if (maskMap.find(key) != maskMap.end()){
+        src_mask = maskMap[key].getNextImage(frameIndex);
+        cv::imshow("image mask", src_mask);
     }else{
         assert(src_image.type() == CV_8UC3);
         src_mask = cv::Mat(src_image.size(),src_image.type(),cv::Scalar(255,255,255));
@@ -96,15 +97,11 @@ bool Motion::getTransformedImage(const int &imageIndex, const int& frameIndex, M
     
     float cX = 0,cY = 0;
     image = cv::Mat(video_h,video_w,src_image.type());
+    cv::Mat image_mask = cv::Mat(video_h,video_w,image.type());
     cv::Mat temp_mask(0,0,image.type());
     //cv::imshow("src_image", src_image);
     t.transformImage(src_image, cX, cY, image, temp_mask);
-    //char out_image[256];
-    //sprintf(out_image, "outimage_%d",imageIndex);
-    //char out_mask[256];
-    //sprintf(out_mask, "outmask_%d",imageIndex);
-    //cv::imshow(out_mask, temp_mask);
-    //cv::imshow(out_image, image);
+    t.transformImage(src_mask, cX, cY, image_mask, temp_mask);
 //    cout<<src_image.size()<<"\n";
 //    cout<<image.size()<<"\n";
 //    cv::waitKey();
@@ -115,11 +112,11 @@ bool Motion::getTransformedImage(const int &imageIndex, const int& frameIndex, M
 //    //printf("%d %d %d %d\n", image.cols, image.rows, image.type(),image.channels());
 //    //cout<<image<<"\n"<<temp_mask<<"\n";
 //    image = image.mul(temp_mask)/255;
-    temp_mask.copyTo(mask);
+    mask = image_mask.mul(temp_mask) / 255;
     
-    char image_mulmask[256];
-    sprintf(image_mulmask, "image_mulmask_%d",imageIndex);
-    cv::imshow(image_mulmask, image);
+//    char image_mulmask[256];
+//    sprintf(image_mulmask, "image_mulmask_%d",imageIndex);
+//    cv::imshow(image_mulmask, image);
     
     return true;
 }
@@ -157,10 +154,10 @@ void __loadJson(const char* jsonPath, Json::Value& root){
     ifs.close();
 }
 
-void __parseJson(const Value& root, const vector<string>& src_image, const vector<string>& src_image_mask_path, ResMap &resMap, ResMap &maskMap, TransformMap &transformMap, ImageIndexIDMap &imageIndexIdMap){
+void __parseJson(const Value& root, const vector<string>& src_image, const vector<string>& src_image_mask_path, ResMap &resMap, ResMap &maskMap, TransformMap &transformMap, ImageIndexIDMap &imageIndexIdMap, vector<string>& layerName){
     
     bool ddd = 0;
-    ddd = root["ddd"].asBool();
+//    ddd = root["ddd"].asBool();
     
     Json::Value layers = root["layers"];//图层
     Json::Value assets = root["assets"];//资源列表
@@ -205,7 +202,7 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
         string resId = assets[i]["id"].asString();
         if (0 ==  strcmp("image", resId.substr(0,5).c_str())){
             Resource res(src_image[src_image_count]);
-            printf("%d, %d\n", res.getHeight(), assets[i]["h"].asInt());
+//            printf("%d, %d\n", res.getHeight(), assets[i]["h"].asInt());
             assert(res.getHeight() == assets[i]["h"].asInt() && res.getWidth() == assets[i]["w"].asInt());
             resMap[resId] = res;
             if (src_image_mask_path.size() > 0){
@@ -221,17 +218,20 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
     int valid_layer_count = 0;
     for (uint i = 0; i< layers.size();i++){
         if (layers[i]["ty"].asInt() == 2){ // image layer
-            assert (ddd == layers[i]["ddd"].asBool());
+//            assert (ddd == layers[i]["ddd"].asBool());
+            layerName.push_back(layers[i]["nm"].asString());
+            ddd = ddd || layers[i]["ddd"].asBool();
+//            ddd = layers[i]["ddd"].asBool();
             string src_id = layers[i]["refId"].asString();
             Json::Value ks = layers[i]["ks"];
             Json::Value o = ks["o"];
             Json::Value p = ks["p"];
             Json::Value a = ks["a"];
-            cout<<a<<"\n";
+//            cout<<a<<"\n";
             
             assert(!a.isNull());
-            if(p.isNull())
-                cout<<layers[i]<<"\n";
+//            if(p.isNull())
+//                cout<<layers[i]<<"\n";
             assert(!p.isNull());
             
             Json::Value rx, ry, rz;
@@ -258,7 +258,7 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
                 ry["a"] = 0;
                 ry["k"] = 0.0;
                 rz = r;
-                cout<<r<<"\n";
+//                cout<<r<<"\n";
                 
             }else{
                 rx = ks["rx"];
@@ -297,7 +297,7 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
                     t.setAY(a["k"][value_index][value_key][(uint)1].asDouble());
                     t.setAZ(a["k"][value_index][value_key][(uint)2].asDouble());
                 }else{
-                    cout<<a["k"]<<"\n";
+//                    cout<<a["k"]<<"\n";
                     t.setAX(a["k"][(uint)0].asDouble());
                     t.setAY(a["k"][(uint)1].asDouble());
                     t.setAZ(a["k"][(uint)2].asDouble());
@@ -330,12 +330,12 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
                      t.setRY(ry["k"].asDouble());
                 }
                 if(rz["a"].asBool()){
-                    printf("-------------\n");
-                    cout<<rz["k"][value_index][value_key]<<"\n";
+//                    printf("-------------\n");
+//                    cout<<rz["k"][value_index][value_key]<<"\n";
                     t.setRZ(rz["k"][value_index][value_key][(uint)0].asDouble());
                 }else{
-                    printf("-------------------\n");
-                    cout<<rz["k"]<<"\n";
+//                    printf("-------------------\n");
+//                    cout<<rz["k"]<<"\n";
                     t.setRZ(rz["k"].asDouble());
                 }
                 
@@ -344,9 +344,9 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
                     t.setSY(s["k"][value_index][value_key][(uint)1].asDouble()/100.0);
                     t.setZ(s["k"][value_index][value_key][(uint)2].asDouble()/100.0);
                     
-                    printf("%f %f %f\n", s["k"][value_index][value_key][(uint)0].asDouble()/100.0
-                           ,s["k"][value_index][value_key][(uint)1].asDouble()/100.0
-                           ,s["k"][value_index][value_key][(uint)2].asDouble()/100.0);
+//                    printf("%f %f %f\n", s["k"][value_index][value_key][(uint)0].asDouble()/100.0
+//                           ,s["k"][value_index][value_key][(uint)1].asDouble()/100.0
+//                           ,s["k"][value_index][value_key][(uint)2].asDouble()/100.0);
                 }else{
                     t.setSX(s["k"][(uint)0].asDouble()/100.0);
                     t.setSY(s["k"][(uint)1].asDouble()/100.0);
@@ -371,3 +371,7 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
     }
     
 }
+
+string Motion::getLayerName(int layerIndex){
+    return layerName[layerIndex];
+};

@@ -8,6 +8,17 @@
 
 #include "resource.hpp"
 #include <assert.h>
+#include <stdio.h>
+#include<assert.h>
+
+bool __RESOURCE_CPP_exists(char* filepath){
+    FILE * f = fopen(filepath,"rb");
+    if (f){
+        fclose(f);
+        return true;
+    }
+    return false;
+}
 
 void getReversedExtension(const char* filepath, char extension[]){
     size_t str_len = strlen(filepath);
@@ -80,6 +91,7 @@ void Resource::getNextRawImage(){
         nextRawImage = *(this->image);
     }
     else if (res_type == RES_TYPE_VIDEO){
+        assert (cap);
         cap->read(nextRawImage);
     }
 }
@@ -101,8 +113,8 @@ Resource::Resource(){
 
 // 目前支持  image: jpg/jpeg, png, video: mp4, avi
 void Resource::load(const char * resPath, int w, int h){
-    
-    
+    printf("loading %s ...\n", resPath);
+//    assert (__RESOURCE_CPP_exists((char*)resPath));
     if (cap){
         cap->release();
         delete cap;
@@ -115,27 +127,33 @@ void Resource::load(const char * resPath, int w, int h){
     
     char reversedExtension[10];
     getReversedExtension(resPath, reversedExtension);
-    printf("%s 666\n", reversedExtension);
+//    printf("%s 666\n", reversedExtension);
     if (!strcmp("gpj", reversedExtension)
         || !strcmp("gnp", reversedExtension)
         || !strcmp("gepj", reversedExtension)){
         this->res_type = RES_TYPE_IMAGE;
+        
         this->image = new cv::Mat();
-        *(this->image) = cv::imread(resPath);
-        assert(image->cols > 0 && image->rows);
+//        *this->image = cv::imread(resPath);
+        assert(this->image);
+        cv::VideoCapture vc(resPath);
+        vc.read(*(this->image));
+        vc.release();
+        assert(image->cols > 0 && image->rows > 0);
         
         frameCount = - 1;
         assert((image->cols == w && image -> rows == h) || (w == 0 && h == 0));
     }
     else if (0 == strcmp("4pm", reversedExtension)
              || 0 == strcmp("iva", reversedExtension)){
-        printf("is video\n");
+//        printf("is video\n");
         this->res_type = RES_TYPE_VIDEO;
         this->cap = new cv::VideoCapture(resPath);
         assert(cap);
         frameCount = cap->get(cv::CAP_PROP_FRAME_COUNT);
         int frameH = cap->get(cv::CAP_PROP_FRAME_HEIGHT);
         int frameW = cap->get(cv::CAP_PROP_FRAME_WIDTH);
+
         assert(frameH == h && frameW == w || h == 0 && w == 0);
     }
     

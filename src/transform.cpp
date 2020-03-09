@@ -9,7 +9,7 @@
 #include "transform.hpp"
 #include "math.h"
 #include <vector>
-
+#include "tools.hpp"
 #include "assert.h"
 
 using namespace std;
@@ -149,6 +149,10 @@ Transform::Transform(const Transform& t) {
 Transform& Transform::operator= (const Transform& t) {
     memcpy(this, &t, sizeof(Transform));
     if(t.cacheMat){
+        if(this->cacheMat){
+            delete this->cacheMat;
+            this->cacheMat = nullptr;
+        }
         this->cacheMat = new CacheTransformMat;
         assert(this->cacheMat != nullptr);
         memcpy(cacheMat, t.cacheMat, sizeof(CacheTransformMat));
@@ -294,6 +298,7 @@ void Transform::transformImage(const cv::Mat& image, const float& centerX, const
     //cv::imshow("m1", mask_image);
     cv::Mat mask_bg = cv::Mat(out_image.size(), mask.type(),cv::Scalar(0,0,0,0));
     cv::warpPerspective(mask_image, mask_bg, this->cacheMat->mat, mask_bg.size());
+//    mask_bg = vg::erode(mask_bg);
     mask_bg.copyTo(mask);
 
 }

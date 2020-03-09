@@ -25,7 +25,7 @@ using namespace std;
  
  */
 
-#define FOUR_CODE (cv::VideoWriter::fourcc('h','2','6','4'))
+#define FOUR_CODE (cv::VideoWriter::fourcc('a','v','c','1'))
 
 int main(int argc, char** argv){
     VideoGenerator vg;
@@ -52,16 +52,16 @@ int main(int argc, char** argv){
     char *bg=NULL, *bg_mask=NULL;
     char *shared=NULL;
     
-    assert(!isNull(json_));json=json_;
-    assert(!isNull(out_));out = out_;
-    if(!isNull(fg_))fg = fg_;
-    if(!isNull(fg_mask_))fg_mask = fg_mask_;
-    if(!isNull(bg_))bg = bg_;
-    if(!isNull(bg_mask_))bg_mask = bg_mask_;
-    if(!isNull(shared_)) shared = shared_;
+    assert(!vg::isNull(json_));json=json_;
+    assert(!vg::isNull(out_));out = out_;
+    if(!vg::isNull(fg_))fg = fg_;
+    if(!vg::isNull(fg_mask_))fg_mask = fg_mask_;
+    if(!vg::isNull(bg_))bg = bg_;
+    if(!vg::isNull(bg_mask_))bg_mask = bg_mask_;
+    if(!vg::isNull(shared_)) shared = shared_;
     
     vector<string> images;
-    assert(!isNull(argv[2]));
+    assert(!vg::isNull(argv[2]));
     stringstream iss(argv[2]);
     char img[256];
     for(;iss>>img;){
@@ -70,7 +70,7 @@ int main(int argc, char** argv){
     }
     
     vector<string> mask(0);
-    if(!isNull(argv[3])){
+    if(!vg::isNull(argv[3])){
         stringstream iss_b(argv[3]);
         for(;iss_b>>img;){
             mask.push_back(img);

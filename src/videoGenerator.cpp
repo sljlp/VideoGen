@@ -17,15 +17,17 @@ cv::Mat VideoGenerator::genFrame(const int& frameIndex){
     
     cv::Mat content(h,w,CV_8UC3,cv::Scalar(0,0,0,0));
     
-    
+    vector<int> txtLayerIndex(0);
     for (int i = 0;i<this->motion.getLyaerCount();i++){
-        
+        if(vg::isText((char*)motion.getLayerName(i).c_str())){
+            txtLayerIndex.push_back(i);
+        }
         cv::Mat image, mask(0,0,CV_8UC3);
         bool hast = motion.getTransformedImage(i, frameIndex, image, mask);
         //printf("has transformation:%d\n", hast);
         if (hast){
-            cv::imshow("image1", image);
-            vg_drawOn(image, content, mask);
+            //cv::imshow("image1", image);
+            vg::vg_drawOn(image, content, mask);
         }
     }
     
@@ -37,7 +39,7 @@ cv::Mat VideoGenerator::genFrame(const int& frameIndex){
         cv::Mat fg_mask = this->foreground_mask.getNextImage(frameIndex);
         content_mask = cv::Scalar(255,255,255,255) - fg_mask;
         cv::Mat temp_fg_mask = cv::Mat(fg_mask.size(),CV_8UC3,cv::Scalar(255,255,255,255));
-        vg_blend(fg, content, temp_fg_mask, content_mask, frame);
+        vg::vg_blend(fg, content, temp_fg_mask, content_mask, frame);
     }
     if(background.isValid() && background_mask.isValid()){
         frame.copyTo(content);
@@ -45,8 +47,24 @@ cv::Mat VideoGenerator::genFrame(const int& frameIndex){
         cv::Mat bg_mask = this->background_mask.getNextImage(frameIndex);
         content_mask = cv::Scalar(255,255,255,255) - bg_mask;
         cv::Mat temp_bg_mask = cv::Mat(bg_mask.size(),CV_8UC3,cv::Scalar(255,255,255,255));
-        vg_blend(bg, content, temp_bg_mask, content_mask, frame);
+        vg::vg_blend(bg, content, temp_bg_mask, content_mask, frame);
     }
+    
+    for (int i : txtLayerIndex){
+//        if(isText((char*)motion.getLayerName(i).c_str())){
+//            txtLayerIndex.push_back(i);
+//        }
+        cv::Mat image, mask(0,0,CV_8UC3);
+        bool hast = motion.getTransformedImage(i, frameIndex, image, mask);
+        //printf("has transformation:%d\n", hast);
+        if (hast){
+            //cv::imshow("image1", image);
+            //cv::imshow("mask", mask);
+            vg::vg_drawOn(image, frame, mask);
+//            cv::waitKey();
+        }
+    }
+    
 
     return frame;
     

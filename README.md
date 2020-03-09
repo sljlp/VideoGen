@@ -8,8 +8,8 @@ python3.6+
 PIL packge for python3  
 opencv3+ package for python3  
 
-## 安装ffmpeg
-## 安装opencv
+### 安装ffmpeg
+### 安装opencv
 
 # samples usage  
 #### 1.编译代码  

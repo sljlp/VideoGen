@@ -25,7 +25,14 @@ using namespace std;
  
  */
 
-#define FOUR_CODE (cv::VideoWriter::fourcc('a','v','c','1'))
+#define H264_AVAILABLE FALSE
+
+
+#if H264_AVAILABLE
+    #define FOUR_CODE (cv::VideoWriter::fourcc('a','v','c','1'))
+#else
+    #define FOUR_CODE (cv::VideoWriter::fourcc('m','p','4','v'))
+#endif
 
 int main(int argc, char** argv){
     VideoGenerator vg;

@@ -76,4 +76,7 @@ opencv3+ package for python3
     cd build  
     cmake ..  
     make  
+  ## other troubles
+1）ffmpeg: error while loading shared libraries: libavdevice.so.58: cannot open shared object file: No such file or directory  
+solution： https://blog.csdn.net/weixin_43166958/article/details/89335679  
 

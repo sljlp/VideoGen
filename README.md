@@ -60,7 +60,7 @@ opencv3+ package for python3
   #### Optional (if downaloading ippicv_2019_lnx_intel64_general_20180723.tgz fails during cmake):  
         mkdir temp  
         Download ippicv_2019_lnx_intel64_general_20180723.tgz into ./temp  
-        Edit ./3rdparty/ippicv/ippicv.cmake (replace  ippicv download path, with “file:<abs path of opencv_package>/temp/“ at line 47)  
+        Edit ./3rdparty/ippicv/ippicv.cmake(at line 47) : replace  ippicv source path with “file:<abs path of opencv_package>/temp/“  
   mkdir build  
   cd build  
   #### 1) cmake ..  

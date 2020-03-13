@@ -57,7 +57,7 @@ opencv3+ package for python3
 ## 3.Install opencv
   Download opencv package  
   cd opencv package  
-  #### Optional (if downaloading ippicv_2019_lnx_intel64_general_20180723.tgz failed):  
+  #### Optional (if downaloading ippicv_2019_lnx_intel64_general_20180723.tgz fails during cmake):  
         mkdir temp  
         Download ippicv_2019_lnx_intel64_general_20180723.tgz into ./temp  
         Edit ./3rdparty/ippicv/ippicv.cmake (replace  ippicv download path, with “file:<abs path of opencv_package>/temp/“ at line 47)  

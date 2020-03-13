@@ -48,19 +48,19 @@ opencv3+ package for python3
   If step 1) successes , skip step 2)  
   #### 2) if step 1) has something wrong, try:  
       Install yasm  
-          Download yasm package
+          Download yasm package  
   	  cd yasm_package  
           ./configure  
           sudo make install  
           Rerun step 1)  
 
 ## 3.Install opencv
-  Download opencv package
+  Download opencv package  
   cd opencv package  
   #### Optional (if downaloading ippicv_2019_lnx_intel64_general_20180723.tgz failed):  
         mkdir temp  
         Download ippicv_2019_lnx_intel64_general_20180723.tgz into ./temp  
-        Edit ./3rdparty/ippicv/ippicv.cmake (replace  ippicv download path, with “file:/home/ubuntu/opencv-4.2/temp/“ at line 47)  
+        Edit ./3rdparty/ippicv/ippicv.cmake (replace  ippicv download path, with “file:<abs path of opencv_package>/temp/“ at line 47)  
   mkdir build  
   cd build  
   #### 1) cmake ..  

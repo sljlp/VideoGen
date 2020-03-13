@@ -39,25 +39,23 @@ opencv3+ package for python3
 ## 1.Install dependencies
 	sudo apt-get install build-essential libgtk2.0-dev libavcodec-dev libavformat-dev libjpeg-dev libtiff5-dev libswscale-dev cmake
 
-Download yasm-1.3.0.tar.gz 
-Download ffmpeg
-Download opencv4.2
-
-
 ## 2.Install ffmpeg (optional, do it if opencv can’t detect ffmpeg)  
   #### 1)  
+  Download ffmpeg package 
   cd ffmpeg_package  
   ./configure --enable-nonfree --enable-pic --enable-shared  
   sudo make install  
   If step 1) successes , skip step 2)  
   #### 2) if step 1) has something wrong, try:  
       Install yasm  
+          Download yasm package
   	  cd yasm_package  
           ./configure  
           sudo make install  
           Rerun step 1)  
 
 ## 3.Install opencv
+Download opencv package
 cd opencv package  
 Optional (if downaloading ippicv_2019_lnx_intel64_general_20180723.tgz failed):  
   mkdir temp  

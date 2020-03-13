@@ -49,7 +49,7 @@ opencv3+ package for python3
   #### 2) if step 1) has something wrong, try:  
       Install yasm  
           Download yasm package  
-  	  cd yasm_package  
+          cd yasm_package  
           ./configure  
           sudo make install  
           Rerun step 1)  

@@ -9,8 +9,13 @@ add_executable(VideoGen ${DIR_SRCS} ${JSON_SRCS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_link_libraries(VideoGen ${OpenCV_LIBS})
 
+FIND_PACKAGE( OpenMP)
+
+
 # to be changed
-# generally set as follow
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-# for some mac you should set as follow
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++0x")
+if(OPENMP_FOUND)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++0x ${OpenMP_CXX_FLAGS}")
+else()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++0x")
+endif(OPENMP_FOUND)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${OpenMP_CXX_FLAGS}")

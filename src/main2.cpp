@@ -52,7 +52,7 @@ int main(int argc, char** argv){
 #else
     
 //    char * root = "/Users/pengliu/Desktop/WY/VideoGen-master";
-    char * root = "/Users/pengliu/Desktop/WY/VideoGen-master/";
+    char * root = "/lp/GenVideo/";
     sprintf(json_, "%s/samples/wy_caishen2/std.json",root);
     sprintf(out_, "%s/samples/wy_caishen2/out.mp4",root);
     sprintf(fg_, "%s/samples/wy_caishen2//std_fg.mp4", root);
@@ -165,8 +165,8 @@ int main(int argc, char** argv){
 //        cv::waitKey();
 //        printf("%d %d\n", f.cols, f.rows);
         outV.write(f);
-        cv::imshow("f",f);
-        cv::waitKey();
+//        cv::imshow("f",f);
+//        cv::waitKey();
         if(i++ == best_frame_index && shared){
             cv::imwrite(shared, f);
         }

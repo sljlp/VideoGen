@@ -14,14 +14,14 @@
 /*
  *changable
  */
-#define VIDEO_BUFFER ON // 将视频所有帧预先加载到内存，内存使用增大，速度提高
-#define MATCACHE ON // 启用变换矩阵缓存， 内存增加， 速度提高
-#define ENABLE_OMP OFF //开启多进程，速度增加，启用VIDEO_BUFFER，关闭MATCACHE, 内存增加,需要支持omp编程
+#define VIDEO_BUFFER ON // 将视频所有帧预先加载到内存，内存使用增大， ON为启用，OFF为关闭
+#define MATCACHE OFF // 启用变换矩阵缓存， 内存增加， 速度提高， ON为启用， OFF为关闭
+#define ENABLE_OMP ON //开启多进程，该选项强制启用VIDEO_BUFFER，同时关闭MATCACHE, 内存增加, 速度增加，需要支持omp编程，若不支持omp则设置为OFF
 
-#define SERVER_MODE ON // 程序模式 ，服务器模式/本地测试
+#define SERVER_MODE OFF // 程序模式 ，服务器模式/本地测试
 
-//#define FOUR_CODE (cv::VideoWriter::fourcc('a','v','c','1'))
-#define FOUR_CODE (cv::VideoWriter::fourcc('m','p','4','v'))
+#define FOUR_CODE (cv::VideoWriter::fourcc('a','v','c','1'))
+//#define FOUR_CODE (cv::VideoWriter::fourcc('m','p','4','v'))
 
 
 /*

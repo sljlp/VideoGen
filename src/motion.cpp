@@ -86,11 +86,20 @@ bool Motion::getTransformedImage(const int &imageIndex, const int& frameIndex, M
     };
     
     string key = this->imageIndexIdMap[imageIndex];
+#if VIDEO_BUFFER
+    Mat src_image = resMap[key].getFrameAt(frameIndex);
+#else
     Mat src_image = resMap[key].getNextImage(frameIndex);
+#endif
     Mat src_mask;
     if (maskMap.find(key) != maskMap.end()){
+#if VIDEO_BUFFER
+        src_mask = maskMap[key].getFrameAt(frameIndex);
+#else
         src_mask = maskMap[key].getNextImage(frameIndex);
-        cv::imshow("image mask", src_mask);
+#endif
+        
+//        cv::imshow("image mask", src_mask);
     }else{
         assert(src_image.type() == CV_8UC3);
         src_mask = cv::Mat(src_image.size(),src_image.type(),cv::Scalar(255,255,255));

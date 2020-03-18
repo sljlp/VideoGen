@@ -63,7 +63,8 @@ opencv3+ package for python3
         Edit ./3rdparty/ippicv/ippicv.cmake(at line 47) : replace  ippicv source path with “file:<abs path of opencv_package>/temp/“  
   mkdir build  
   cd build  
-  #### 1) cmake ..  
+  #### 1) 
+     cmake ..  
      sudo make install  
      If this step successes, skip 2)  
   #### 2) if step 1) has something wrong , try:  

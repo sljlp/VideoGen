@@ -98,6 +98,8 @@ void Resource::getNextRawImage(){
 #if VIDEO_BUFFER
         assert (frames);
         nextRawImage = this->frames[nextFrameIndex];
+//        cv::imshow("img", nextRawImage);
+//        cv::waitKey();
 #else
         assert(cap);
         cap->read(nextRawImage);
@@ -164,6 +166,9 @@ void Resource::load(const char * resPath, int w, int h){
         frameCount = cap->get(cv::CAP_PROP_FRAME_COUNT);
         int frameH = cap->get(cv::CAP_PROP_FRAME_HEIGHT);
         int frameW = cap->get(cv::CAP_PROP_FRAME_WIDTH);
+        width = frameW;
+        height = frameH;
+        fps = cap->get(cv::CAP_PROP_FPS);
 //
 #if VIDEO_BUFFER
         this->frames = new cv::Mat[frameCount];
@@ -185,7 +190,7 @@ int Resource::getWidth()const {
     if(this->res_type == RES_TYPE_IMAGE)
         return this->image->cols;
     else if (res_type == RES_TYPE_VIDEO)
-        return cap->get(cv::CAP_PROP_FRAME_WIDTH);
+        return width;
     return 0;
 }
 int Resource::getHeight()const {
@@ -193,7 +198,7 @@ int Resource::getHeight()const {
     if(this->res_type == RES_TYPE_IMAGE)
         return this->image->rows;
     else if(res_type == RES_TYPE_VIDEO)
-        return cap->get(cv::CAP_PROP_FRAME_HEIGHT);
+        return height;
     return 0;
 }
 

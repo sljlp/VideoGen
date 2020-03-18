@@ -35,16 +35,27 @@ cv::Mat VideoGenerator::genFrame(const int& frameIndex) {
     cv::Mat frame(h,w,CV_8UC3, cv::Scalar(0,0,0,0));
     content.copyTo(frame);
     if(foreground.isValid() && foreground_mask.isValid()){
+#if VIDEO_BUFFER
+        cv::Mat fg = this->foreground.getFrameAt(frameIndex);
+        cv::Mat fg_mask = this->foreground_mask.getFrameAt(frameIndex);
+#else
         cv::Mat fg = this->foreground.getNextImage(frameIndex);
         cv::Mat fg_mask = this->foreground_mask.getNextImage(frameIndex);
+#endif
         content_mask = cv::Scalar(255,255,255,255) - fg_mask;
         cv::Mat temp_fg_mask = cv::Mat(fg_mask.size(),CV_8UC3,cv::Scalar(255,255,255,255));
         vg::vg_blend(fg, content, temp_fg_mask, content_mask, frame);
     }
     if(background.isValid() && background_mask.isValid()){
         frame.copyTo(content);
-        cv::Mat bg = this->background.getNextImage(frameIndex);
-        cv::Mat bg_mask = this->background_mask.getNextImage(frameIndex);
+        #if VIDEO_BUFFER
+                cv::Mat bg = this->background.getFrameAt(frameIndex);
+                cv::Mat bg_mask = this->background_mask.getFrameAt(frameIndex);
+        #else
+                cv::Mat bg = this->background.getNextImage(frameIndex);
+                cv::Mat bg_mask = this->background_mask.getNextImage(frameIndex);
+        #endif
+        
         content_mask = cv::Scalar(255,255,255,255) - bg_mask;
         cv::Mat temp_bg_mask = cv::Mat(bg_mask.size(),CV_8UC3,cv::Scalar(255,255,255,255));
         vg::vg_blend(bg, content, temp_bg_mask, content_mask, frame);

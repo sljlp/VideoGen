@@ -36,6 +36,8 @@ private:
     cv::Mat* frames = NULL;
     int nextFrameIndex = 0;
     
+    int width, height, fps;
+    
 public:
     
     Resource(const char* );
@@ -69,7 +71,7 @@ public:
     
     double getFPS()const {
         assert(loaded && cap && image == nullptr);
-        return cap->get(cv::CAP_PROP_FPS);
+        return fps;
     }
     
 };

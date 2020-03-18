@@ -52,7 +52,7 @@ int main(int argc, char** argv){
 #else
     
 //    char * root = "/Users/pengliu/Desktop/WY/VideoGen-master";
-    char * root = "/lp/GenVideo/";
+    char * root = "/Users/pengliu/Desktop/WY/VideoGen-master/";
     sprintf(json_, "%s/samples/wy_caishen2/std.json",root);
     sprintf(out_, "%s/samples/wy_caishen2/out.mp4",root);
     sprintf(fg_, "%s/samples/wy_caishen2//std_fg.mp4", root);
@@ -104,13 +104,17 @@ int main(int argc, char** argv){
     }
 #else
     mask.resize(0);
+//    best_time = 10;
 #endif
     
     float in_fps = 0.0;
     int in_w = 0, in_h = 0;
     float best_time=0;
-    
+#if SERVER_MODE
     sscanf(argv[4], "%f %d %d %f", &in_fps, &in_w, &in_h, &best_time);
+#else
+    best_time=10;
+#endif
     
     vg.loadData(json, &images, &mask, fg, fg_mask,bg, bg_mask);
     int fc = vg.getFrameCount();
@@ -144,6 +148,8 @@ int main(int argc, char** argv){
     for(int i = 0;i<fc;i++){
         cv::Mat frame = vg.genFrame(i);
         frames[i] = frame;
+//        cv::imshow("img", frame);
+//        cv::waitKey();
 //        outV.write(frame);
     }
 #if ENABLE_OMP
@@ -151,10 +157,16 @@ int main(int argc, char** argv){
     printf("cost time : %.5f\n", t2 - t1);
 #endif
     cv::VideoWriter outV = VideoWriter(out, FOUR_CODE, fps, cv::Size(w,h), true);
+    printf("opened: %d\n", outV.isOpened());
+    printf("frames count %d\n",frames.size());
     int i = 0;
     for (cv::Mat f : frames){
+//        cv::imshow("img", f);
+//        cv::waitKey();
 //        printf("%d %d\n", f.cols, f.rows);
         outV.write(f);
+        cv::imshow("f",f);
+        cv::waitKey();
         if(i++ == best_frame_index && shared){
             cv::imwrite(shared, f);
         }

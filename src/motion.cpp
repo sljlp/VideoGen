@@ -225,6 +225,9 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
      ],
      */
     int src_image_count = 0;
+#if ENABLE_OMP
+//#pragma omp parallel for
+#endif
     for (int i = 0;i<assets.size();i++){
         string resId = assets[i]["id"].asString();
         if (0 ==  strcmp("image", resId.substr(0,5).c_str())){
@@ -243,14 +246,30 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
     
 //    TransformMap transformMap;
     int valid_layer_count = 0;
+    vector<Value> valid_layer;
     for (uint i = 0; i< layers.size();i++){
-        if (layers[i]["ty"].asInt() == 2){ // image layer
+        if (layers[i]["ty"].asInt() == 2){
+            valid_layer.push_back(layers[i]);
+            valid_layer_count ++;
+        }
+    }
+    layerName.resize(valid_layer_count);
+#if ENABLE_OMP
+//#pragma omp parallel for
+#endif
+    for (uint i = 0; i< valid_layer.size();i++){
+        if (valid_layer[i]["ty"].asInt() == 2){ // image layer
 //            assert (ddd == layers[i]["ddd"].asBool());
-            layerName.push_back(layers[i]["nm"].asString());
-            ddd = ddd || layers[i]["ddd"].asBool();
+//            cout<< layers
+//            cout<<valid_layer[i];
+//            Value vt = valid_layer[i]["nm"];
+//            vt.asString();
+//            cout<<vt;
+            layerName[i] = valid_layer[i]["nm"].asString();
 //            ddd = layers[i]["ddd"].asBool();
-            string src_id = layers[i]["refId"].asString();
-            Json::Value ks = layers[i]["ks"];
+            
+            string src_id = valid_layer[i]["refId"].asString();
+            Json::Value ks = valid_layer[i]["ks"];
             Json::Value o = ks["o"];
             Json::Value p = ks["p"];
             Json::Value a = ks["a"];
@@ -265,10 +284,8 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
             Json::Value sx, sy, sz;
             //"ip": 181,
             //"op": 375,
-            int start_frame_index = layers[i]["ip"].asInt();
-            int end_frame_index = layers[i]["op"].asInt();
-            
-            
+            int start_frame_index = valid_layer[i]["ip"].asInt();
+            int end_frame_index = valid_layer[i]["op"].asInt();
             
             Json::Value s = ks["s"];
             if (s.isNull()){
@@ -380,19 +397,19 @@ void __parseJson(const Value& root, const vector<string>& src_image, const vecto
                     t.setZ(s["k"][(uint)2].asDouble()/100.0);
                 }
                 
-                Json::Value &father_layer = layers[i]["parent"];
+                Json::Value &father_layer = valid_layer[i]["parent"];
                 if (!father_layer.isNull()){
                     string f_id = parseTransformId(father_layer.asInt(), frame_index);
                     assert(transformMap.find(f_id) != transformMap.end());
                     t.followTransform(transformMap[f_id]);
                 }
                 
-                string trans_id = parseTransformId(valid_layer_count, frame_index);
+                string trans_id = parseTransformId(i, frame_index);
                 transformMap[trans_id] = t;
                 
             }
             
-            imageIndexIdMap[valid_layer_count++] = src_id;
+            imageIndexIdMap[i] = src_id;
             
         }
     }

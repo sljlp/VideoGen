@@ -20,8 +20,8 @@
 
 #define SERVER_MODE ON // 程序模式 ，服务器模式/本地测试
 
-#define FOUR_CODE (cv::VideoWriter::fourcc('a','v','c','1'))
-//#define FOUR_CODE (cv::VideoWriter::fourcc('m','p','4','v'))
+//#define FOUR_CODE (cv::VideoWriter::fourcc('a','v','c','1'))
+#define FOUR_CODE (cv::VideoWriter::fourcc('m','p','4','v'))
 
 
 /*

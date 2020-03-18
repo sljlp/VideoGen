@@ -8,6 +8,7 @@ cmake3.0+
 python3.6+  
 PIL packge for python3  
 opencv3+ package for python3  
+openmp (多线程加速，可选)
 
 ### 安装ffmpeg
 1.从官网下载ffmpeg安装包并解压  

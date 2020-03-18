@@ -41,7 +41,8 @@ void Motion::loadResource(const char* json, const vector<string> &imagpath, cons
     this->json_start_index = root["ip"].asInt();
     
     layerCount = imageIndexIdMap.size();
-    
+    this->layersCacheMat = vector<Transform>(layerCount);
+//    ÷layersCacheMat = vector<CacheTransformMat>(layerCount);
 //    Json::Value layers = root["layers"];//图层
 //    for (uint i = 0; i< layers.size();i++){
 //        if (layers[i]["ty"].asInt() == 2){
@@ -60,14 +61,14 @@ string parseTransformId(const int& image_id, const int& frame_id){
     return string(parsedId);
 }
 
-int Motion::getVideoH(){
+int Motion::getVideoH() {
     return this->video_h;
 }
-int Motion::getVideoW(){
+int Motion::getVideoW() {
     return this->video_w;
 }
 
-bool Motion::getTransform(const int& imageIndex, const int& frameIndex, Transform&  outTransform){
+bool Motion::getTransform(const int& imageIndex, const int& frameIndex, Transform&  outTransform) {
     string tId = parseTransformId(imageIndex, frameIndex);
     if (transformMap.find(tId) != transformMap.end()){
         outTransform = transformMap[tId];
@@ -77,7 +78,7 @@ bool Motion::getTransform(const int& imageIndex, const int& frameIndex, Transfor
 //    Transform();
 }
 
-bool Motion::getTransformedImage(const int &imageIndex, const int& frameIndex, Mat &image, Mat & mask){
+bool Motion::getTransformedImage(const int &imageIndex, const int& frameIndex, Mat &image, Mat & mask) {
     
     Transform t;
     if(this->getTransform(imageIndex, frameIndex, t) == false){
@@ -100,8 +101,24 @@ bool Motion::getTransformedImage(const int &imageIndex, const int& frameIndex, M
     cv::Mat image_mask = cv::Mat(video_h,video_w,image.type());
     cv::Mat temp_mask(0,0,image.type());
     //cv::imshow("src_image", src_image);
-    t.transformImage(src_image, cX, cY, image, temp_mask);
-    t.transformImage(src_mask, cX, cY, image_mask, temp_mask);
+#if MATCACHE
+    if(t == layersCacheMat[imageIndex]){
+        const CacheTransformMat * cache = layersCacheMat[imageIndex].getCacheMat();
+        assert (cache);
+//        assert(layersCacheMat[imageIndex])
+        t.transformImage(src_image, cX, cY, image, temp_mask, cache);
+        t.transformImage(src_mask, cX, cY, image_mask, temp_mask, cache);
+    }
+    else{
+        t.transformImage(src_image, cX, cY, image, temp_mask, nullptr);
+        t.transformImage(src_mask, cX, cY, image_mask, temp_mask, nullptr);
+        layersCacheMat[imageIndex] = t;
+    }
+#else
+    t.transformImage(src_image, cX, cY, image, temp_mask, nullptr);
+    t.transformImage(src_mask, cX, cY, image_mask, temp_mask, nullptr);
+#endif
+    
 //    cout<<src_image.size()<<"\n";
 //    cout<<image.size()<<"\n";
 //    cv::waitKey();
@@ -152,6 +169,7 @@ void __loadJson(const char* jsonPath, Json::Value& root){
     ifs.open(jsonPath);
     jsonReader.parse(ifs, root);
     ifs.close();
+    
 }
 
 void __parseJson(const Value& root, const vector<string>& src_image, const vector<string>& src_image_mask_path, ResMap &resMap, ResMap &maskMap, TransformMap &transformMap, ImageIndexIDMap &imageIndexIdMap, vector<string>& layerName){

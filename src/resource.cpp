@@ -76,6 +76,9 @@ Resource::~Resource(){
         cap->release();
         delete cap;
     }
+    if (frames){
+        delete [] frames;
+    }
 }
 
 cv::Mat Resource::getNextImage(const int &frameIndex){
@@ -91,9 +94,16 @@ void Resource::getNextRawImage(){
         nextRawImage = *(this->image);
     }
     else if (res_type == RES_TYPE_VIDEO){
-        assert (cap);
+        
+#if VIDEO_BUFFER
+        assert (frames);
+        nextRawImage = this->frames[nextFrameIndex];
+#else
+        assert(cap);
         cap->read(nextRawImage);
+#endif
     }
+    nextFrameIndex ++;
 }
 
 Resource::Resource(){
@@ -113,6 +123,7 @@ Resource::Resource(){
 
 // 目前支持  image: jpg/jpeg, png, video: mp4, avi
 void Resource::load(const char * resPath, int w, int h){
+    nextFrameIndex = 0;
     printf("loading %s ...\n", resPath);
 //    assert (__RESOURCE_CPP_exists((char*)resPath));
     if (cap){
@@ -153,7 +164,14 @@ void Resource::load(const char * resPath, int w, int h){
         frameCount = cap->get(cv::CAP_PROP_FRAME_COUNT);
         int frameH = cap->get(cv::CAP_PROP_FRAME_HEIGHT);
         int frameW = cap->get(cv::CAP_PROP_FRAME_WIDTH);
-
+//
+#if VIDEO_BUFFER
+        this->frames = new cv::Mat[frameCount];
+        for (int t = 0; t< frameCount;t++){
+            this->cap->read(this->frames[t]);
+        }
+        this->cap->release();
+#endif
         assert(frameH == h && frameW == w || h == 0 && w == 0);
     }
     
@@ -162,7 +180,7 @@ void Resource::load(const char * resPath, int w, int h){
     getNextRawImage();
 }
 
-int Resource::getWidth(){
+int Resource::getWidth()const {
     if (!this->loaded)return 0;
     if(this->res_type == RES_TYPE_IMAGE)
         return this->image->cols;
@@ -170,13 +188,25 @@ int Resource::getWidth(){
         return cap->get(cv::CAP_PROP_FRAME_WIDTH);
     return 0;
 }
-int Resource::getHeight(){
+int Resource::getHeight()const {
     if(!loaded)return 0;
     if(this->res_type == RES_TYPE_IMAGE)
         return this->image->rows;
     else if(res_type == RES_TYPE_VIDEO)
         return cap->get(cv::CAP_PROP_FRAME_HEIGHT);
     return 0;
+}
+
+cv::Mat Resource::getFrameAt(const int &frameIndex){
+    cv::Mat frame;
+    if (this->getType() == RES_TYPE_IMAGE){
+        this->image->copyTo(frame);
+    }else if(this->getType() == RES_TYPE_VIDEO){
+        assert (this->frames);
+        assert (frameIndex >= 0 && frameIndex < this->getFrameCount());
+        this->frames[frameIndex].copyTo(frame);
+    }
+    return frame;
 }
 
 

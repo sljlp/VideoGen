@@ -8,7 +8,7 @@
 
 #ifndef motion_hpp
 #define motion_hpp
-
+#include "global_conf.h"
 #include <stdio.h>
 #include "json/json.h"
 
@@ -42,18 +42,18 @@ public:
     //得到第frameIndex帧的第imageIndex张图片的变换
     //将变换存储到outTransform
     //若返回值为True， 则有变换，否则无变换
-    bool getTransform(const int& imageIndex, const int& frameIndex, Transform&  outTransform);
-    bool getTransformedImage(const int &imageIndex, const int& frameIndex, Mat &image, Mat & mask);
-    Json::Value getRoot();
-    int getLyaerCount();
+    bool getTransform(const int& imageIndex, const int& frameIndex, Transform&  outTransform) ;
+    bool getTransformedImage(const int &imageIndex, const int& frameIndex, Mat &image, Mat & mask)  ;
+    Json::Value getRoot() ;
+    int getLyaerCount() ;
     int getVideoW();
     int getVideoH();
     void loadResource(const char* json, const vector<string> &imagpath, const vector<string>& maskPath);
     
-    int getFrameCount(){
+    int getFrameCount()const {
         return this->framecount;
     }
-    int getJsonStartIndex(){
+    int getJsonStartIndex() {
         return json_start_index;
     }
     
@@ -66,6 +66,8 @@ private:
     ResMap maskMap;
     std::vector<string> layerName;
     ImageIndexIDMap imageIndexIdMap;
+    
+    std::vector<Transform> layersCacheMat;
     
     int video_w;
     int video_h;

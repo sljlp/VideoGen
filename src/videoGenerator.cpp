@@ -11,7 +11,7 @@
 #include "assert.h"
 #include "tools.hpp"
 
-cv::Mat VideoGenerator::genFrame(const int& frameIndex){
+cv::Mat VideoGenerator::genFrame(const int& frameIndex) {
     int w = motion.getVideoW();
     int h = motion.getVideoH();
     

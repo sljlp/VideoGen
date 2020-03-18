@@ -14,12 +14,6 @@
 
 using namespace std;
 
-#ifndef ABS
-#define ABS(x) ((x)<0?-(x):(x))
-#endif
-#ifndef MIN_POSITIVE_FLOAT
-#define MIN_POSITIVE_FLOAT 1e-12
-#endif
 
 //Mat Transform::getMatrix(float iw, float ih){
 //    float x = this->x,y = this->y,z = this->z;
@@ -147,17 +141,22 @@ Transform::Transform(const Transform& t) {
 }
 
 Transform& Transform::operator= (const Transform& t) {
+    if (this->cacheMat){
+        delete this->cacheMat;
+        this->cacheMat = nullptr;
+    }
     memcpy(this, &t, sizeof(Transform));
     if(t.cacheMat){
-        if(this->cacheMat){
-            delete this->cacheMat;
-            this->cacheMat = nullptr;
-        }
         this->cacheMat = new CacheTransformMat;
+//        if(this->cacheMat){
+//            delete this->cacheMat;
+//            this->cacheMat = nullptr;
+//        }
         assert(this->cacheMat != nullptr);
-        memcpy(cacheMat, t.cacheMat, sizeof(CacheTransformMat));
-        cacheMat->mat=cv::Mat();
-        t.cacheMat->mat.copyTo(cacheMat->mat);
+//        memcpy(cacheMat, t.cacheMat, sizeof(CacheTransformMat));
+        
+//        cacheMat->mat=cv::Mat();
+        this->cacheMat->copy(*t.cacheMat);
     }
     return *this;
 }
@@ -203,6 +202,7 @@ void Transform::set(float x,float y,float z, float rx, float ry, float rz, float
     this->ddd = ddd;
     this->cacheMat = nullptr;
 }
+
 
 void Transform::processTransform(const int& imW, const int& imH, const float& centerX, const float& centerY, const int& outW, const int& outH, cv::Mat fatherMat){
     assert((fatherMat.cols == 0 || fatherMat.rows == 0) || fatherMat.type() == CV_32F);
@@ -279,17 +279,20 @@ void Transform::processTransform(const int& imW, const int& imH, const float& ce
 }
 
 //该矩阵作用与输入图片，得到变换后的图像
-void Transform::transformImage(const cv::Mat& image, const float& centerX, const float& centerY, cv::Mat& out_image, cv::Mat& mask) {
+void Transform::transformImage(const cv::Mat& image, const float& centerX, const float& centerY, cv::Mat& out_image, cv::Mat& mask, const CacheTransformMat * cachemat) {
 
     assert (out_image.type() == CV_8UC3);
     assert (mask.type() == CV_8UC3);
     
     //cv::imshow("image0", image);
-    
-    this->processTransform(image.cols, image.rows, centerX, centerY, out_image.cols, out_image.rows);
+    CacheTransformMat * temp_cache_mat=(CacheTransformMat*)cachemat;
+    if (!cachemat){
+        this->processTransform(image.cols, image.rows, centerX, centerY, out_image.cols, out_image.rows);
+        temp_cache_mat = this->cacheMat;
+    }
     //cout<<cacheMat->mat<<"\n";
     //cout<<"mat:\n"<<cacheMat->mat<<"\n";
-    cv::warpPerspective(image, out_image, this->cacheMat->mat, out_image.size());
+    cv::warpPerspective(image, out_image, temp_cache_mat->mat, out_image.size());
 
     //cv::imshow("img1", out_image);
 //    cv::waitKey();
@@ -297,7 +300,7 @@ void Transform::transformImage(const cv::Mat& image, const float& centerX, const
     mask_image = cv::Mat(image.size(),mask.type(), cv::Scalar(255,255,255,255));
     //cv::imshow("m1", mask_image);
     cv::Mat mask_bg = cv::Mat(out_image.size(), mask.type(),cv::Scalar(0,0,0,0));
-    cv::warpPerspective(mask_image, mask_bg, this->cacheMat->mat, mask_bg.size());
+    cv::warpPerspective(mask_image, mask_bg, temp_cache_mat->mat, mask_bg.size());
 //    mask_bg = vg::erode(mask_bg);
     mask_bg.copyTo(mask);
 

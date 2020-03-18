@@ -9,10 +9,7 @@
 #ifndef resource_hpp
 #define resource_hpp
 
-#ifndef MAX
-    #define MAX(x,y) ((x)>(y)?(x):(y))
-    #define MIN(x,y) ((x)<(y)?(x):(y))
-#endif
+#include "global_conf.h"
 
 #include <stdio.h>
 
@@ -20,7 +17,6 @@
 using namespace cv;
 #include <string>
 using namespace std;
-
 
 #define RES_TYPE_VIDEO 0x01
 #define RES_TYPE_IMAGE 0x02
@@ -37,6 +33,8 @@ private:
     void getNextRawImage();
     
     int frameCount;
+    cv::Mat* frames = NULL;
+    int nextFrameIndex = 0;
     
 public:
     
@@ -51,6 +49,7 @@ public:
     
     void load(const char*, int h = 0, int w = 0);
     Mat getNextImage(const int& frameIndex);
+    Mat getFrameAt(const int& frameIndex);
     
     int getType(){
         assert(loaded);
@@ -61,14 +60,14 @@ public:
         return frameCount;
     }
     
-    int getWidth();
-    int getHeight();
+    int getWidth()const ;
+    int getHeight()const ;
     
-    bool isValid(){
+    bool isValid() const {
         return loaded;
     }
     
-    double getFPS(){
+    double getFPS()const {
         assert(loaded && cap && image == nullptr);
         return cap->get(cv::CAP_PROP_FPS);
     }

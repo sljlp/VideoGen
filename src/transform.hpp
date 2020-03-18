@@ -15,6 +15,39 @@
 #include <opencv2/opencv.hpp>
 using namespace cv;
 
+
+#ifndef ABS
+#define ABS(x) ((x)<0?-(x):(x))
+#endif
+#ifndef MIN_POSITIVE_FLOAT
+#define MIN_POSITIVE_FLOAT 1e-9
+#endif
+
+#define EQ(x,y) (ABS((x)-(y)) < MIN_POSITIVE_FLOAT)
+
+class CacheTransformMat{
+public:
+    int imW, imH;
+    int outW, outH;
+    float centerX, centerY;
+    cv::Mat father_mat;
+    cv::Mat mat;
+    CacheTransformMat(){
+        
+    }
+    ~CacheTransformMat(){
+        
+    }
+    void copy(const CacheTransformMat& cache){
+        this->imW = cache.imW;
+        this->imH = cache.imH;
+        centerX = cache.centerX;
+        centerY = cache.centerY;
+        cache.father_mat.copyTo(father_mat);
+        cache.mat.copyTo(mat);
+    }
+};
+
 class Transform{
 private:
     float x, y, z;
@@ -23,13 +56,7 @@ private:
     float opcity;
     float anchorx,anchory,anchorz;
     bool ddd;
-    struct CacheTransformMat{
-        int imW, imH;
-        int outW, outH;
-        float centerX, centerY;
-        cv::Mat father_mat;
-        cv::Mat mat;
-    }* cacheMat = NULL;
+    CacheTransformMat * cacheMat;
     
 public:
     
@@ -59,7 +86,7 @@ public:
     
     void processTransform(const int&, const int&, const float&, const float&, const int& outW = 0, const int& outH = 0, cv::Mat fatherMat = cv::Mat());
     //该矩阵作用与输入图片，得到变换后的图像
-    void transformImage(const cv::Mat& image,const float& centerX, const float& centerY, cv::Mat& out_image, cv::Mat& mask);
+    void transformImage(const cv::Mat& image,const float& centerX, const float& centerY, cv::Mat& out_image, cv::Mat& mask, const CacheTransformMat * cachemat=nullptr);
     
     float getOpacity();
     
@@ -107,6 +134,25 @@ public:
     inline void setAZ(float z){
 //        setAXYZ(nullptr,nullptr,&z);
         anchorz = z;
+    }
+    
+    bool operator == (const Transform& t){
+        EQ(x,t.x);
+        EQ(y,t.y);
+        EQ(z,t.z);
+        EQ(rx,t.rx);
+        EQ(ry,t.ry);
+        EQ(rz,t.rz);
+        return
+        EQ(x,t.x) && EQ(y,t.y) && EQ(z,t.z) &&
+        EQ(rx,t.rx) && EQ(ry,t.ry) && EQ(rz,t.rz) &&
+        EQ(sx,t.sx) && EQ(sy,t.sy) && EQ(sz,t.sz) &&
+        EQ(opcity,t.opcity) &&
+        EQ(anchorx,t.anchorx) && EQ(anchory,t.anchory) && EQ(anchorz,t.anchorz);
+    }
+    
+    const CacheTransformMat* getCacheMat()const {
+        return cacheMat;
     }
     
 };

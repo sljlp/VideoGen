@@ -28,7 +28,7 @@ private:
 public:
     VideoGenerator();
     VideoGenerator(const char* json_path, const vector<string> *images_path, const vector<string> *mask_path, const char* foreground_path, const char* foreground_mask_path, const char* background_path = nullptr, const char* background_mask_path = nullptr);
-    cv::Mat genFrame(const int& frameIndex);
+    cv::Mat genFrame(const int& frameIndex) ;
     
     void loadData(const char* json_path, const vector<string> *images_path=nullptr, const vector<string> *mask_path=nullptr, const char* foreground_path=nullptr, const char* foreground_mask_path=nullptr, const char* background_path = nullptr, const char* background_mask_path = nullptr);
     int getFrameCount(){

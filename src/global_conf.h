@@ -16,7 +16,7 @@
  */
 #define VIDEO_BUFFER OFF // 将视频所有帧预先加载到内存，内存使用增大， ON为启用，OFF为关闭
 #define MATCACHE ON // 启用变换矩阵缓存， 内存增加， 速度提高， ON为启用， OFF为关闭
-#define ENABLE_OMP OFF //开启多进程，该选项强制启用VIDEO_BUFFER，同时关闭MATCACHE, 内存增加, 速度增加，需要支持omp编程，若不支持omp则设置为OFF
+#define ENABLE_OMP OFF //开启多线程，该选项强制启用VIDEO_BUFFER，同时关闭MATCACHE, 内存增加, 速度增加，需要支持omp编程，若不支持omp则设置为OFF
 
 #define SERVER_MODE ON // 程序模式 ，服务器模式/本地测试
 

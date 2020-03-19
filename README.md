@@ -82,3 +82,9 @@ openmp (多线程加速，可选)
 1）ffmpeg: error while loading shared libraries: libavdevice.so.58: cannot open shared object file: No such file or directory  
 solution： https://blog.csdn.net/weixin_43166958/article/details/89335679  
 
+
+# Test
+    cd samples/wy
+    <modify ../test.sh>
+    sh ../test.sh
+

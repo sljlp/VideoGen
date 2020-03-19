@@ -83,8 +83,8 @@ openmp (多线程加速，可选)
 solution： https://blog.csdn.net/weixin_43166958/article/details/89335679  
 
 
-# Test
-  首先修改samples/test.sh 脚本，设置程序路径，然后执行一下命令  
-    cd samples/wy
+# Test 
+    首先修改samples/test.sh 脚本，设置程序路径，然后执行以下命令  
+    cd samples/wy/
     sh ../test.sh
 

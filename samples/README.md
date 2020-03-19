@@ -13,7 +13,7 @@ genTxt.py 的参数有:
             --mask 可选， 文字的mask输出路径  
 ## VideoGen可以获取最终视频(参考[samples/test.sh](https://github.com/sljlp/VideoGen/blob/master/samples/test.sh))
 VideoGen 的参数有：  
-            arg[1] ：json tempout fg fgm bg bgm share 6个参数作为一组输入，一次表示json文件，无声视频输出路径，前景视频，前景蒙版，背景视频，背景蒙版，分享界面图片，json是必选，其他为可选，当为可选时，必须设值为null字符串  
+            arg[1] ：json tempout fg fgm bg bgm share 6个参数作为一组输入，一次表示json文件，无声视频输出路径，前景视频，前景蒙版，背景视频，背景蒙版，分享界面图片，json是必选，其他为可选，当可选不存在或者不需要时，必须设值为null字符串  
             arg[2]: images 若干图片路径作为输入，其中既有用户上传的图片，也有文字图片  
             arg[3]: image_mask 可选，若选择，则路径个数与iamges相等，否则，设置为null字符串  
             arg[4]: fps w h best_time， 四个参数作为一组输入 ,一次表示帧率，视频宽度，视频高度，作为分享界面的最佳时间点（单位是秒），前三个参数一般用不到（只有没有资源视频的时候才会人为设定），可设置为0  

@@ -27,11 +27,9 @@
 /*
  unchangable
  */
-#if MATCACHE
-#define ENABLE_OMP OFF
-#endif
 
 #if ENABLE_OMP
+#define MATCACHE OFF
 #define VIDEO_BUFFER ON
 #endif
 

@@ -141,6 +141,7 @@ int main(int argc, char** argv){
     if(best_frame_index>=fc)best_frame_index = fc-1;
     std::vector<cv::Mat> frames(vg.getFrameCount());
     printf("fc: %d\n", fc);
+    printf("OMP: %d\n", ENABLE_OMP);
 #if ENABLE_OMP
     double t1 = omp_get_wtime();
 #pragma omp parallel for

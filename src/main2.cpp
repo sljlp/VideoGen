@@ -115,8 +115,10 @@ int main(int argc, char** argv){
 #else
     best_time=10;
 #endif
-    
+    double pt1 = omp_get_wtime();
     vg.loadData(json, &images, &mask, fg, fg_mask,bg, bg_mask);
+    double pt2 = omp_get_wtime();
+    printf("parse time:%f\n", pt2 - pt1);
     int fc = vg.getFrameCount();
     int w, h;
     double fps;
@@ -157,6 +159,7 @@ int main(int argc, char** argv){
     double t2 = omp_get_wtime();
     printf("cost time : %.5f\n", t2 - t1);
 #endif
+    double wt1 = omp_get_wtime();
     cv::VideoWriter outV = VideoWriter(out, FOUR_CODE, fps, cv::Size(w,h), true);
     printf("opened: %d\n", outV.isOpened());
     printf("frames count %d\n",frames.size());
@@ -173,6 +176,8 @@ int main(int argc, char** argv){
         }
     }
     outV.release();
+    double wt2 = omp_get_wtime();
+    printf("write time:%f\n", wt2 - wt1);
 #if ENABLE_OMP
     double total_t2 = omp_get_wtime();
     printf("total time:%.5f\n", total_t2 - total_t1);
